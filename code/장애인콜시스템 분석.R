@@ -303,3 +303,40 @@ final_2022 <- df_2022_rm_na
 tail(final_2022)
 
 # write.xlsx(final_2022, "data/final_2022.xlsx")
+
+# 출발지구군 구별 대기시간 계산
+df_2019_rm_na$`대기시간(m)_num` <- as.numeric(df_2019_rm_na$`대기시간(m)`)
+mean_wait_gu_2019 <- df_2019_rm_na %>% 
+  group_by(출발지구군) %>% 
+  summarise(mean_waiting_mins = round(mean(`대기시간(m)_num`, na.rm = T), 2)) %>% # 종로구(승차일시가 배차일시보다 빠름), 1건
+  arrange(desc(mean_waiting_mins))
+
+sum(is.na(df_2019_rm_na)) # 39
+na_df_2019 <- df_2019_rm_na[!complete.cases(df_2019_rm_na), ]
+
+df_2020_rm_na$`대기시간(m)_num` <- as.numeric(df_2020_rm_na$`대기시간(m)`)
+mean_wait_gu_2020 <- df_2020_rm_na %>% 
+  group_by(출발지구군) %>% 
+  summarise(mean_waiting_mins = round(mean(`대기시간(m)_num`, na.rm = T), 2)) %>% # 관악구, 영등포구(배차일시 1건, 승차일시 1건), 2건
+  arrange(desc(mean_waiting_mins))
+
+sum(is.na(df_2020_rm_na)) # 43
+na_df_2020 <- df_2020_rm_na[!complete.cases(df_2020_rm_na), ]
+
+df_2021_rm_na$`대기시간(m)_num` <- as.numeric(df_2021_rm_na$`대기시간(m)`)
+mean_wait_gu_2021 <- df_2021_rm_na %>% 
+  group_by(출발지구군) %>% 
+  summarise(mean_waiting_mins = round(mean(`대기시간(m)_num`, na.rm = T), 2)) %>% # 강서구 (승차일시), 1건
+  arrange(desc(mean_waiting_mins))
+
+sum(is.na(df_2021_rm_na)) # 34
+na_df_2021 <- df_2021_rm_na[!complete.cases(df_2021_rm_na), ]
+
+df_2022_rm_na$`대기시간(m)_num` <- as.numeric(df_2022_rm_na$`대기시간(m)`)
+mean_wait_gu_2022 <- df_2022_rm_na %>% 
+  group_by(출발지구군) %>% 
+  summarise(mean_waiting_mins = round(mean(`대기시간(m)_num`, na.rm = T), 2)) %>% # 없음
+  arrange(desc(mean_waiting_mins))
+
+sum(is.na(df_2022_rm_na)) # 26
+na_df_2022 <- df_2022_rm_na[!complete.cases(df_2022_rm_na), ]
