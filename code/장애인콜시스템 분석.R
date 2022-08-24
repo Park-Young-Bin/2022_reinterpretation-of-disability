@@ -304,7 +304,7 @@ tail(final_2022)
 
 # write.xlsx(final_2022, "data/final_2022.xlsx")
 
-# 출발지구군 구별 대기시간 계산
+# 출발지구군 기준 구별 대기시간 계산
 df_2019_rm_na$`대기시간(m)_num` <- as.numeric(df_2019_rm_na$`대기시간(m)`)
 mean_wait_gu_2019 <- df_2019_rm_na %>% 
   group_by(출발지구군) %>% 
@@ -336,7 +336,54 @@ df_2022_rm_na$`대기시간(m)_num` <- as.numeric(df_2022_rm_na$`대기시간(m)
 mean_wait_gu_2022 <- df_2022_rm_na %>% 
   group_by(출발지구군) %>% 
   summarise(mean_waiting_mins = round(mean(`대기시간(m)_num`, na.rm = T), 2)) %>% # 없음
+  filter(mean_waiting_mins > 0) %>% # 평균 대기 시간이 0 이상인 것만 추출(마포구 1건, 강남구 2건)
   arrange(desc(mean_waiting_mins))
+
 
 sum(is.na(df_2022_rm_na)) # 26
 na_df_2022 <- df_2022_rm_na[!complete.cases(df_2022_rm_na), ]
+
+# 출발지구군별 대기시간 그래프 구현
+# 2019년
+ggplot(data = mean_wait_gu_2019, aes(y = reorder(출발지구군,mean_waiting_mins), x = mean_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2019년 서울시 구별 평균 대기 시간(분)') +
+  xlab('평균 대기 시간(분)') +
+  ylab('출발지구군') +
+  xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 5)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 2020년
+ggplot(data = mean_wait_gu_2020, aes(y = reorder(출발지구군, mean_waiting_mins), x = mean_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2020년 서울시 구별 평균 대기 시간(분)') +
+  xlab('평균 대기 시간(분)') +
+  ylab('출발지구군') +
+  xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 5)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 2021년
+ggplot(data = mean_wait_gu_2021, aes(y = reorder(출발지구군, mean_waiting_mins), x = mean_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2021년 서울시 구별 평균 대기 시간(분)') +
+  xlab('평균 대기 시간(분)') +
+  ylab('출발지구군') +
+  xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 5)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 2022년
+ggplot(data = mean_wait_gu_2022, aes(y = reorder(출발지구군, mean_waiting_mins), x = mean_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2022년 서울시 구별 평균 대기 시간(분)') +
+  xlab('평균 대기 시간(분)') +
+  ylab('출발지구군') +
+  xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 10)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
