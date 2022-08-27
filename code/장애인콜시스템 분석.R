@@ -387,3 +387,13 @@ ggplot(data = mean_wait_gu_2022, aes(y = reorder(출발지구군, mean_waiting_m
   xlim(0, 60) +
   # scale_x_continuous(breaks = seq(0, 60, 10)) +
   theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 
+str(df_2019_rm_na)
+df_2019_asc <- df_2019_rm_na %>% arrange(승차일시) # 승차일시 기준으로 오름차순
+ggplot(data = df_2019_asc %>% 
+         select(승차일시, `대기시간(m)_num`) %>% 
+         filter(`대기시간(m)_num` > 0), aes(x = 승차일시, y = `대기시간(m)_num`)) +
+  geom_line(color = "#00AFBB") +
+  theme_bw() +
+  ylab('평균 대기 시간(분)')
