@@ -388,12 +388,114 @@ ggplot(data = mean_wait_gu_2022, aes(y = reorder(출발지구군, mean_waiting_m
   # scale_x_continuous(breaks = seq(0, 60, 10)) +
   theme(plot.title = element_text(face = 'bold', hjust = .5))
 
-# 
-str(df_2019_rm_na)
-df_2019_asc <- df_2019_rm_na %>% arrange(승차일시) # 승차일시 기준으로 오름차순
-ggplot(data = df_2019_asc %>% 
-         select(승차일시, `대기시간(m)_num`) %>% 
-         filter(`대기시간(m)_num` > 0), aes(x = 승차일시, y = `대기시간(m)_num`)) +
-  geom_line(color = "#00AFBB") +
-  theme_bw() +
-  ylab('평균 대기 시간(분)')
+######## 다시----
+df_2019_1 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(19.01.01~19.08.31).xlsx', sheet = 2)
+df_2019_2 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(19.09.01~19.12.31).xlsx', sheet = 2)
+df_2019 <- rbind(df_2019, df_2019_2)
+df_2020_1 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(20.01.01~20.08.31).xlsx', sheet = 2)
+df_2020_2 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(20.09.01~20.12.31).xlsx', sheet = 2)
+df_2020 <- rbind(df_2020_1, df_2020_2)
+df_2021_1 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(21.01.01~21.08.31).xlsx', sheet = 2)
+df_2021_2 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(21.09.01~21.12.31).xlsx', sheet = 2)
+df_2021 <- rbind(df_2021_1, df_2021_2)
+df_2022 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(22.01.01~22.08.20).xlsx', sheet = 2)
+
+# 대시기간 데이터 형 변환
+df_2019$`대기시간(m)` <- as.integer(df_2019$`대기시간(m)`)
+df_2020$`대기시간(m)` <- as.integer(df_2020$`대기시간(m)`)
+df_2021$`대기시간(m)` <- as.integer(df_2021$`대기시간(m)`)
+df_2022$`대기시간(m)` <- as.integer(df_2022$`대기시간(m)`)
+summary(df_2019 %>% filter(출발지구군 == '성북구') %>% select('대기시간(m)'))
+
+# 출발지구군 기준 구별 대기시간 계산
+max_wait_gu_2019 <- df_2019 %>% 
+  group_by(출발지구군) %>% 
+  summarise(max_waiting_mins = round(max(`대기시간(m)`, na.rm = T), 2))
+  arrange(desc(max_waiting_mins))
+
+sum(is.na(df_2019)) # 35 (예정일시가 na)
+na_df_2019 <- df_2019[!complete.cases(df_2019), ]
+
+max_wait_gu_2020 <- df_2020 %>% 
+  group_by(출발지구군) %>% 
+  summarise(max_waiting_mins = round(max(`대기시간(m)`, na.rm = T), 2)) %>%
+  arrange(desc(max_waiting_mins))
+
+sum(is.na(df_2020)) # 35 (예정일시가 na)
+na_df_2020 <- df_2020[!complete.cases(df_2020), ]
+
+max_wait_gu_2021 <- df_2021 %>% 
+  group_by(출발지구군) %>% 
+  summarise(max_waiting_mins = round(max(`대기시간(m)`, na.rm = T), 2)) %>% # 강서구 (승차일시), 1건
+  arrange(desc(max_waiting_mins))
+
+sum(is.na(df_2021)) # 30 (예정일시가 na)
+na_df_2021 <- df_2021[!complete.cases(df_2021), ]
+
+max_wait_gu_2022 <- df_2022 %>% 
+  group_by(출발지구군) %>% 
+  summarise(max_waiting_mins = round(max(`대기시간(m)`, na.rm = T), 2)) %>% # 없음
+  arrange(desc(max_waiting_mins))
+
+sum(is.na(df_2022)) # 26 (예정일시가 na)
+na_df_2022 <- df_2022[!complete.cases(df_2022), ]
+
+# max_wait_gu_2019[30,1] <- '인천부평구'
+# max_wait_gu_2019[48,1] <- '인천남동구'
+
+# max_wait_gu_2020[40,1] <- '인천부평구'
+# max_wait_gu_2020[45,1] <- '인천남동구'
+
+# max_wait_gu_2021[43,1] <- '인천부평구'
+# max_wait_gu_2021[46,1] <- '인천서구'
+# max_wait_gu_2021[48,1] <- '인천남동구'
+# max_wait_gu_2021[55,1] <- '인천계양구'
+
+# max_wait_gu_2022[42,1] <- '인천부평구'
+# max_wait_gu_2022[47,1] <- '인천남동구'
+# max_wait_gu_2022[49,1] <- '인천계양구'
+
+# 출발지구군별 대기시간 그래프 구현
+# 2019년
+ggplot(data = max_wait_gu_2019, aes(y = reorder(출발지구군, max_waiting_mins), x = max_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2019년 서울시 구별 최대 대기 시간(분)') +
+  xlab('최대 대기 시간(분)') +
+  ylab('출발지구군') +
+  # xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 5)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 2020년
+ggplot(data = max_wait_gu_2020, aes(y = reorder(출발지구군, max_waiting_mins), x = max_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2020년 서울시 구별 최대 대기 시간(분)') +
+  xlab('최대 대기 시간(분)') +
+  ylab('출발지구군') +
+  # xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 5)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 2021년
+ggplot(data = max_wait_gu_2021, aes(y = reorder(출발지구군, max_waiting_mins), x = max_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2021년 서울시 구별 최대 대기 시간(분)') +
+  xlab('최대 대기 시간(분)') +
+  ylab('출발지구군') +
+  # xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 5)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 2022년
+ggplot(data = max_wait_gu_2022, aes(y = reorder(출발지구군, max_waiting_mins), x = max_waiting_mins)) +
+  geom_col() +
+  theme_bw() + 
+  ggtitle('2022년 서울시 구별 최대 대기 시간(분)') +
+  xlab('최대 대기 시간(분)') +
+  ylab('출발지구군') +
+  # xlim(0, 60) +
+  # scale_x_continuous(breaks = seq(0, 60, 10)) +
+  theme(plot.title = element_text(face = 'bold', hjust = .5))
