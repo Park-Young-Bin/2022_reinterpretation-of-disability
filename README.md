@@ -1,2 +1,2 @@
 # 2022_reinterpretation_of_disability
-## 장애의 재해석
+### 2022년 장애의 재해석 논문 경진대회
