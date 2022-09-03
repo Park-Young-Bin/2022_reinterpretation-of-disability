@@ -499,3 +499,11 @@ ggplot(data = max_wait_gu_2022, aes(y = reorder(출발지구군, max_waiting_min
   # xlim(0, 60) +
   # scale_x_continuous(breaks = seq(0, 60, 10)) +
   theme(plot.title = element_text(face = 'bold', hjust = .5))
+
+# 2021년 정제 데이터만 csv 저장
+# preprodf_2021_1 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(21.01.01~21.08.31).xlsx', sheet = 2)
+# preprodf_2021_2 <- read_excel('C:/Users/user/Desktop/Python/NRC(콜택시)/data/장애인콜시스템(21.09.01~21.12.31).xlsx', sheet = 2)
+
+preprodf_2021 <- rbind(preprodf_2021_1, preprodf_2021_2)
+
+write.csv(preprodf_2021, 'data/장애인콜시스템(21.01.01~21.12.31)정제ver.csv')
